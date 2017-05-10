@@ -9,8 +9,8 @@ package daql.ss2017.programmingtask1.data.modelling;
 
 import daql.ss2017.programmingtask1.data.parser.ItemsTsvParser;
 import daql.ss2017.programmingtask1.data.parser.UserItemsTsvParser;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.vocabulary.RDF;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,7 +76,6 @@ public class DataModeler {
             value.add(itemType);
             this.itemsMap.put(key, value);
         }
-        System.out.println();
     }
 
     /**
@@ -91,16 +90,29 @@ public class DataModeler {
     public void processUserItems(String userItemsFilename, String namespace)
             throws IOException {
 
+        Property likes = ResourceFactory.createProperty("foaf:", "likes");
+
         this.userItemsParser = new UserItemsTsvParser(userItemsFilename);
-        while (this.userItemsParser.hasReachedEndOfFile()) {
+        while (!this.userItemsParser.hasReachedEndOfFile()) {
             this.userItemsParser.readNextLine();
-//            String subject = this.itemsParser.getCurrentItemUri();
-//            String predicate = "rdf:type";
-//            String object = ;
-//            Triple triple = new Triple();
+
+            String currentUserId = this.userItemsParser.getCurrentUserId();
+            ArrayList<String> currentUsersItem = this.itemsMap.get(this.userItemsParser.getCurrentItemId());
+
+            String itemsUri = currentUsersItem.get(0);
+            String itemsTypeString = currentUsersItem.get(1);
+
+            Resource itemURI = ResourceFactory.createResource(itemsUri);
+            Resource itemType = getItemTypeResource(itemsTypeString);
+            Statement item = ResourceFactory.createStatement(itemURI, RDF.type, itemType);
+
+            Resource userSubject = ResourceFactory.createResource(currentUserId);
+            Resource itemLikedByUser = ResourceFactory.createResource(itemsUri);
+            Statement user = ResourceFactory.createStatement(userSubject, likes, itemLikedByUser);
+
+            tripleStoreModel.add(item);
+            tripleStoreModel.add(user);
         }
-        //Add the triples as required
-        //Complete the code here....
 
         //DO NOT REMOVE THIS CODE
         tripleStoreModel.setNsPrefix("daql", "http://daql.ss2017/");
@@ -120,7 +132,20 @@ public class DataModeler {
      */
     private static Resource getItemTypeResource(String itemType) {
         Resource res = null;
-
+        switch (itemType) {
+            case "book":
+                res = ResourceFactory.createResource("http://dbpedia.org/ontology/Book");
+                break;
+            case "movie":
+                res = ResourceFactory.createResource("http://dbpedia.org/ontology/Film");
+                break;
+            case "music_band":
+                res = ResourceFactory.createResource("http://dbpedia.org/ontology/Band");
+                break;
+            case "music_artist":
+                res = ResourceFactory.createResource("http://dbpedia.org/ontology/Artist");
+                break;
+        }
         return res;
     }
 
