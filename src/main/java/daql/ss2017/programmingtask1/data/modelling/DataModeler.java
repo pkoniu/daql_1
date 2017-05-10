@@ -106,7 +106,7 @@ public class DataModeler {
             Resource itemType = getItemTypeResource(itemsTypeString);
             Statement item = ResourceFactory.createStatement(itemURI, RDF.type, itemType);
 
-            Resource userSubject = ResourceFactory.createResource(currentUserId);
+            Resource userSubject = ResourceFactory.createResource(namespace + currentUserId);
             Resource itemLikedByUser = ResourceFactory.createResource(itemsUri);
             Statement user = ResourceFactory.createStatement(userSubject, likes, itemLikedByUser);
 
