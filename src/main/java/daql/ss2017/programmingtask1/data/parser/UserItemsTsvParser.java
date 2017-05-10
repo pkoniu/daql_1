@@ -52,6 +52,8 @@ public class UserItemsTsvParser {
     public void readNextLine() throws IOException {
         this.currentLine = this.fileReader.readLine();
 
+        if (this.currentLine == null) return;
+
         this.currentLineTokens = this.currentLine.split("\t");
 
         this.currentUserId = this.currentLineTokens[0];
