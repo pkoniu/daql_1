@@ -90,6 +90,7 @@ public class DataModeler {
     public void processUserItems(String userItemsFilename, String namespace)
             throws IOException {
 
+//        Property likes =  ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/likes");
         Property likes = ResourceFactory.createProperty("foaf:", "likes");
 
         this.userItemsParser = new UserItemsTsvParser(userItemsFilename);
